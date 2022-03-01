@@ -35,3 +35,27 @@ def find_duplicate_ogroups(ogroups_list: dict):
         for dupl in duplicate_objects.keys():
             print(f"object-group {dupl} has duplicates: {', '.join(duplicate_objects[dupl])}")
     print('*' * 10, 'done looking for duplicate object groups', '*' * 10)
+
+
+def print_empty_ogroups(og_list: dict):
+    empty_ogroups = str()
+    for next_object in og_list.keys():
+        if len(og_list[next_object]) == 0:
+            empty_ogroups = empty_ogroups + f"\t\t {next_object}\n"
+    if empty_ogroups:
+        empty_ogroups = 'Empty object groups found:\n' + empty_ogroups
+        print(empty_ogroups)
+
+
+def find_redundant_lines_in_ogroup(og_list: dict):
+    print('*' * 10, 'looking for duplicate lines in object groups', '*' * 10)
+    for ogroup in og_list.keys():
+        actual_length = len(og_list[ogroup])
+        optimal_length = len(set(og_list[ogroup]))
+        collapsed_length = len(list(collapse_addresses(og_list[ogroup])))
+        if optimal_length != actual_length:
+            print(f"object-group {ogroup} has {actual_length} elements, only {optimal_length} unique")
+        if collapsed_length != actual_length:
+            print(f"object-group {ogroup} has {actual_length} elements, can be summarized \
+into {collapsed_length} elements")
+    print('*' * 10, 'done looking for duplicate lines in object groups', '*' * 10)

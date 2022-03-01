@@ -3,16 +3,6 @@ from ipaddress import IPv4Address, IPv4Network, collapse_addresses
 from tools import obj_parse, og_parse
 
 
-def print_empty_objects(obj_list: dict):
-    empty_objects = str()
-    for next_object in obj_list.keys():
-        if len(obj_list[next_object]) == 0:
-            empty_objects = empty_objects + f"\t\t {next_object}\n"
-    if empty_objects:
-        empty_objects = 'Empty objects found:\n' + empty_objects
-        print(empty_objects)
-
-
 if len(argv) != 2:
     print('Usage: asa_acl_optimizer <config.txt>')
     exit(1)
@@ -64,6 +54,12 @@ for line in config:
         current_object = line.split()[1]
         continue
 
-print_empty_objects(objects)
-obj_parse.find_duplicate_objects(objects)
-og_parse.find_duplicate_ogroups(obj_groups)
+
+for ogroup in obj_groups.keys():
+    obj_groups[ogroup] = sorted(obj_groups[ogroup])
+
+#obj_parse.print_empty_objects(objects)
+#obj_parse.find_duplicate_objects(objects)
+#og_parse.print_empty_ogroups(obj_groups)
+#og_parse.find_duplicate_ogroups(obj_groups)
+og_parse.find_redundant_lines_in_ogroup(obj_groups)

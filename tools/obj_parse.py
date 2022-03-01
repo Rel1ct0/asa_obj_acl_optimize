@@ -2,19 +2,20 @@ from ipaddress import IPv4Address, IPv4Network, collapse_addresses
 
 
 def obj_parse(line: str):
+    answer = list()
     if line.startswith(' nat'):
         return None
     if line.startswith(' host'):
-        return list(IPv4Network(line.split()[-1]))
+        answer.append(IPv4Network(line.split()[-1]))
+        return answer
     if line.startswith(' subnet'):
-        answer = list()
         answer.append(IPv4Network(line.split()[1] + '/' + line.split()[2]))
         return answer
     if line.startswith(' range'):
-        candidate_addresses = list()
+        answer = list()
         for address in range(int(IPv4Address(line.split()[1])), int(IPv4Address(line.split()[2])) + 1):
-            candidate_addresses.append(IPv4Network(address))
-        return list(collapse_addresses(candidate_addresses))
+            answer.append(IPv4Network(address))
+        return list(collapse_addresses(answer))
     return None
 
 
@@ -36,3 +37,13 @@ def find_duplicate_objects(objects: dict):
         for dupl in duplicate_objects.keys():
             print(f"object {dupl} has duplicates: {', '.join(duplicate_objects[dupl])}")
     print('*' * 10, 'done looking for duplicate objects', '*' * 10)
+
+
+def print_empty_objects(obj_list: dict):
+    empty_objects = str()
+    for next_object in obj_list.keys():
+        if len(obj_list[next_object]) == 0:
+            empty_objects = empty_objects + f"\t\t {next_object}\n"
+    if empty_objects:
+        empty_objects = 'Empty objects found:\n' + empty_objects
+        print(empty_objects)
