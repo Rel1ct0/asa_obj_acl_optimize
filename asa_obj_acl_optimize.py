@@ -39,13 +39,13 @@ for line in config:
             objects[current_object] = list()
         if object_parsed := obj_parse.obj_parse(line):       # Object content successfully parsed
             objects[current_object].extend(object_parsed)    # Add content to objects dict
-            now_processing = ''                              # And reset processing
-            current_object = ''
+        now_processing = ''                              # And reset processing
+        current_object = ''
         continue
     if now_processing == 'obj_group':
         if not obj_groups.get(current_object):  # New object group to add
             obj_groups[current_object] = list()
-        if og_parsed := og_parse.og_parse(line):  # Object group content successfully parsed
+        if og_parsed := og_parse.og_parse(line, objects, obj_groups):  # Object group content successfully parsed
             obj_groups[current_object].extend(og_parsed)  # Add content to object groups dict
             continue
         else:
@@ -65,5 +65,5 @@ for line in config:
         continue
 
 print_empty_objects(objects)
-
 obj_parse.find_duplicate_objects(objects)
+og_parse.find_duplicate_ogroups(obj_groups)

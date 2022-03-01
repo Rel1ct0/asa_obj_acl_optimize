@@ -19,6 +19,7 @@ def obj_parse(line: str):
 
 
 def find_duplicate_objects(objects: dict):
+    print('*' * 10, 'looking for duplicate objects', '*' * 10)
     mentioned_objects = set()
     duplicate_objects = dict()
     keys = list(objects.keys())
@@ -34,3 +35,4 @@ def find_duplicate_objects(objects: dict):
     if duplicate_objects:
         for dupl in duplicate_objects.keys():
             print(f"object {dupl} has duplicates: {', '.join(duplicate_objects[dupl])}")
+    print('*' * 10, 'done looking for duplicate objects', '*' * 10)
