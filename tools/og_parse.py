@@ -1,12 +1,10 @@
 from ipaddress import IPv4Address, IPv4Network, collapse_addresses
 
 
-def obj_parse(line: str):
-    if line.startswith(' nat'):
-        return None
-    if line.startswith(' host'):
+def og_parse(line: str):
+    if line.startswith(' group-object'):
         return list(IPv4Network(line.split()[-1]))
-    if line.startswith(' subnet'):
+    if line.startswith(' network-object'):
         answer = list()
         answer.append(IPv4Network(line.split()[1] + '/' + line.split()[2]))
         return answer
@@ -18,7 +16,7 @@ def obj_parse(line: str):
     return None
 
 
-def find_duplicate_objects(objects: dict):
+def find_duplicate_ogroups(objects: dict):
     mentioned_objects = set()
     duplicate_objects = dict()
     keys = list(objects.keys())

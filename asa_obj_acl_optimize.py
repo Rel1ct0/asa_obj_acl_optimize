@@ -1,6 +1,6 @@
 from sys import argv
 from ipaddress import IPv4Address, IPv4Network, collapse_addresses
-from tools import obj_parse
+from tools import obj_parse, og_parse
 
 
 def print_empty_objects(obj_list: dict):
@@ -9,8 +9,8 @@ def print_empty_objects(obj_list: dict):
         if len(obj_list[next_object]) == 0:
             empty_objects = empty_objects + f"\t\t {next_object}\n"
     if empty_objects:
-       empty_objects = 'Empty objects found:\n' + empty_objects
-       print(empty_objects)
+        empty_objects = 'Empty objects found:\n' + empty_objects
+        print(empty_objects)
 
 
 if len(argv) != 2:
@@ -35,15 +35,22 @@ for line in config:
     if line.startswith(' description'):
         continue
     if now_processing == 'object':
-        if not objects.get(current_object):
+        if not objects.get(current_object):   # New object to add
             objects[current_object] = list()
-        if object_parsed := obj_parse.obj_parse(line):
-            objects[current_object].extend(object_parsed)
-            now_processing = ''
+        if object_parsed := obj_parse.obj_parse(line):       # Object content successfully parsed
+            objects[current_object].extend(object_parsed)    # Add content to objects dict
+            now_processing = ''                              # And reset processing
             current_object = ''
         continue
     if now_processing == 'obj_group':
-        pass
+        if not obj_groups.get(current_object):  # New object group to add
+            obj_groups[current_object] = list()
+        if og_parsed := og_parse.og_parse(line):  # Object group content successfully parsed
+            obj_groups[current_object].extend(og_parsed)  # Add content to object groups dict
+            continue
+        else:
+            now_processing = ''  # Not an object group config line, continue processing
+            current_object = ''
     if line.startswith('object network'):
         now_processing = 'object'
         current_object = line.split()[-1]
@@ -59,5 +66,4 @@ for line in config:
 
 print_empty_objects(objects)
 
-for z in objects.keys():
-    print(f'{z}: {objects[z]}')
+obj_parse.find_duplicate_objects(objects)
