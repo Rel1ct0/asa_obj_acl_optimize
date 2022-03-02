@@ -1,9 +1,20 @@
 from ipaddress import IPv4Address, IPv4Network, collapse_addresses
 
 
+def ogroups_equal(first, second):
+    first_networks = [x[1] for x in first]
+    second_networks = [x[1] for x in second]
+    if first_networks == second_networks:
+        return True
+    return False
+
+
 def og_parse(line, objects_list, ogroups_list) -> list:
     if line.startswith(' group-object'):
-        return ogroups_list[line.split()[-1]]
+        answer = list()
+        for network in ogroups_list[line.split()[-1]]:
+            answer.append(network[1])
+        return answer
     if line.startswith(' network-object'):
         if line.split()[1] == 'host':
             answer = list()
@@ -26,7 +37,7 @@ def find_duplicate_ogroups(ogroups_list: dict):
         for j in range(i+1, len(keys)):
             if keys[j] in mentioned_objects:
                 continue
-            if ogroups_list[keys[i]] == ogroups_list[keys[j]]:
+            if ogroups_equal(ogroups_list[keys[i]], ogroups_list[keys[j]]):
                 if not duplicate_objects.get(keys[i]):
                     duplicate_objects[keys[i]] = list()
                 duplicate_objects[keys[i]].append(keys[j])
@@ -51,8 +62,11 @@ def find_redundant_lines_in_ogroup(og_list: dict):
     print('*' * 10, 'looking for summarizable elements in object groups', '*' * 10)
     summarizable_groups = list()
     for ogroup in og_list.keys():
-        actual_length = len(og_list[ogroup])
-        collapsed_length = len(list(collapse_addresses(og_list[ogroup])))
+        networks = list()
+        for net in og_list[ogroup]:
+            networks.append(net[1])
+        actual_length = len(networks)
+        collapsed_length = len(list(collapse_addresses(networks)))
         if collapsed_length != actual_length:
             summarizable_groups.append((ogroup, actual_length, collapsed_length))
     summarizable_groups.sort(key=lambda x: x[1]-x[2], reverse=True)
@@ -60,3 +74,5 @@ def find_redundant_lines_in_ogroup(og_list: dict):
             print(f"object-group {group[0]} has {group[1]} elements, can be summarized \
 into {group[2]} elements, saving {group[1]-group[2]} elements")
     print('*' * 10, 'done looking for summarizable elements in object groups', '*' * 10)
+
+

@@ -36,7 +36,8 @@ for line in config:
         if not obj_groups.get(current_object):  # New object group to add
             obj_groups[current_object] = list()
         if og_parsed := og_parse.og_parse(line, objects, obj_groups):  # Object group content successfully parsed
-            obj_groups[current_object].extend(og_parsed)  # Add content to object groups dict
+            for new_group_element in og_parsed:
+                obj_groups[current_object].append((line.strip(), new_group_element))  # Add content to ogroups dict
             continue
         else:
             now_processing = ''  # Not an object group config line, continue processing
@@ -56,7 +57,7 @@ for line in config:
 
 
 for ogroup in obj_groups.keys():
-    obj_groups[ogroup] = sorted(obj_groups[ogroup])
+    obj_groups[ogroup] = sorted(obj_groups[ogroup], key=lambda x: x[1])
 
 #obj_parse.print_empty_objects(objects)
 #obj_parse.find_duplicate_objects(objects)
