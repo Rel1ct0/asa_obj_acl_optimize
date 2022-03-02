@@ -48,14 +48,15 @@ def print_empty_ogroups(og_list: dict):
 
 
 def find_redundant_lines_in_ogroup(og_list: dict):
-    print('*' * 10, 'looking for duplicate lines in object groups', '*' * 10)
+    print('*' * 10, 'looking for summarizable elements in object groups', '*' * 10)
+    summarizable_groups = list()
     for ogroup in og_list.keys():
         actual_length = len(og_list[ogroup])
-        optimal_length = len(set(og_list[ogroup]))
         collapsed_length = len(list(collapse_addresses(og_list[ogroup])))
-        if optimal_length != actual_length:
-            print(f"object-group {ogroup} has {actual_length} elements, only {optimal_length} unique")
         if collapsed_length != actual_length:
-            print(f"object-group {ogroup} has {actual_length} elements, can be summarized \
-into {collapsed_length} elements")
-    print('*' * 10, 'done looking for duplicate lines in object groups', '*' * 10)
+            summarizable_groups.append((ogroup, actual_length, collapsed_length))
+    summarizable_groups.sort(key=lambda x: x[1]-x[2], reverse=True)
+    for group in summarizable_groups:
+            print(f"object-group {group[0]} has {group[1]} elements, can be summarized \
+into {group[2]} elements, saving {group[1]-group[2]} elements")
+    print('*' * 10, 'done looking for summarizable elements in object groups', '*' * 10)
